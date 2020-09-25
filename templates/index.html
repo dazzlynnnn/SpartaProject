@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <script type="text/javascript"
+            src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=8n4ctlpx4w&submodules=geocoder"></script>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+    <title>project_testing</title>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <style>
+        .jumbotron-fluid {
+            background: #00462a;
+            color: white;
+            height: 180px;
+        }
+
+        a {
+            color: #00462a;
+        }
+
+        a:hover {
+            color: #00462a;
+        }
+
+        body {
+            background: #fbfbfb;
+        }
+
+        * {
+            font-family: 'Jua', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h2 class="display-4">벗맛게 도장깨기</h2>
+        <p class="lead">이화여대 에브리타임 '벗들의 맛집' 게시판 속 맛집 모아보고, 나만의 리뷰도 기록해보자!</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!--    왼쪽에 들어가는 지도-->
+        <div class="col-sm">
+            <div id="map" style="width:600px;height:440px;"></div>
+        </div>
+
+        <!--    오른쪽에 들어가는 탭-->
+        <div style="height:440px;width:600px;overflow:auto" class="col-sm">
+            <!--        탭 설정-->
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a class="nav-item nav-link active" id="nav-search-tab" data-toggle="tab" href="#nav-search"
+                       role="tab"
+                       aria-controls="nav-search" aria-selected="true">검색</a>
+                    <a class="nav-item nav-link" id="nav-review-tab" data-toggle="tab" href="#nav-review" role="tab"
+                       aria-controls="nav-profile" aria-selected="false">리뷰 입력</a>
+                    <a class="nav-item nav-link" id="nav-my-tab" data-toggle="tab" href="#nav-my"
+                       role="tab"
+                       aria-controls="nav-profile" aria-selected="false">마이 리뷰</a>
+                </div>
+            </nav>
+
+            <!--        탭 아래 페이지 설정-->
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-search" role="tabpanel" aria-labelledby="nav-search-tab">
+                    <!--                검색 탭-->
+                    <div class="wrap">
+                        <p></p>
+                        <!--                    검색창-->
+                        <div class="input-group mb-3">
+                            <input id="search" type="text" class="form-control" placeholder="맛집 이름 입력">
+                            <div class="input-group-append">
+                                <button type="button" style="background-color:#00462a; color:white;"
+                                        class="btn btn-success" onclick="mySearch()">검색
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                리스트-->
+                    <p></p>
+                    <ul class="list-group" id="matjip-box"></ul>
+                </div>
+                <!--            리뷰 입력 탭-->
+                <div class="tab-pane fade" id="nav-review" role="tabpanel" aria-labelledby="nav-review-tab">
+                    <form>
+                        <div id="post-box" class="form-post">
+                            <div>
+                                <p></p>
+                                <div class="form-group">
+                                    <label for="post-title">맛집 이름</label>
+                                    <input id="post-title" class="form-control" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label for="post-comment">리뷰</label>
+                                    <textarea id="post-comment" class="form-control" rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <input type="file" name="file" class="form-control-file" id="post-pic">
+                                </div>
+                                <p></p>
+                                <button type="button" class="btn btn-primary"
+                                        style="margin-left: 200px; background-color:#00462a; color:white;"
+                                        onclick="postArticle()">리뷰 저장
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!--            마이 리뷰 탭-->
+                <div class="tab-pane fade" id="nav-my" role="tabpanel" aria-labelledby="nav-my-tab">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        showList();
+        reviewList();
+    });
+
+    // 초기 페이지 지도 설정
+    var mapOptions = {center: new naver.maps.LatLng(37.559652, 126.945587), zoom: 15};
+    var map = new naver.maps.Map('map', mapOptions);
+
+    function postArticle() {
+        let title = $('#post-title').val()
+        let comment = $('#post-comment').val()
+        let pic = $('#post-pic').val()
+
+        if (title == "") {
+            alert("맛집 이름을 입력해주세요")
+            $("#post-title").focus()
+            return
+        } else if (comment == "") {
+            alert("리뷰를 입력해주세요")
+            $("#post-comment").focus()
+            return
+        } else if (pic == "") {
+            alert("파일를 입력해주세요")
+            $("#post-comment").focus()
+            return
+        }
+
+        $.ajax({
+                type: "POST",
+                url: "/review",
+                data: {'title': title, 'comment': comment},
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        alert(response["msg"]);
+                        fileSave()
+                        window.location.reload()
+                    }
+                }
+            }
+        )
+    }
+
+    function fileSave() {
+        var file_data = $("#post-pic").prop("files")[0]; // Getting the properties of file from file field
+        var form_data = new FormData(); // Creating object of FormData class
+        form_data.append("file", file_data)
+
+        $.ajax({
+            url: '/file',
+            type: 'POST',
+            processData: false, // important
+            contentType: false, // important
+            dataType: 'json',
+            data: form_data
+        });
+    }
+
+    //검색
+    function mySearch() {
+        let search = $('#search').val();
+        if (search == '') {
+            alert('맛집 이름을 입력하세요');
+            return;
+        }
+
+        // 기존 맛집 목록이 있으면 지우기
+        $('#matjip-box').empty();
+        // 맛집 정보 요청
+        $.ajax({
+            type: "GET",
+            url: `/search?name=${search}`,
+            data: {},
+            success: function (response) {
+                // 맛집 요청 성공 여부 검사
+                if (response['result'] == 'success') {
+                    // 전달받은 맛집을 matjip에 저장한다.
+                    let matjip = response['matjip'];
+
+                    console.log(matjip);
+                    for (i = 0; i < matjip.length; i++) {
+                        matjip[i] = getMatjipListWithGeoData(matjip[i]);
+                        makeList(matjip[i]['title'], matjip[i]['category']);
+                    }
+                    //리스트 새로고침 버튼
+                    $('#matjip-box').append(`<p></p><center>
+                        <button type="button" style="background-color:#00462a; color:white; "
+                                class="btn btn-success" onclick=window.location.reload()>리스트 새로고침
+                        </button>
+                    </center>`);
+                    drawMap(matjip);
+
+                } else {
+                    alert('해당 이름의 맛집이 없습니다.');
+                    window.location.reload();
+                }
+            }
+        });
+    }
+
+    //처음 로딩
+    function showList() {
+        $.ajax({
+            type: 'GET',
+            url: '/list',
+            data: {},
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    let matjip = response['matjip'];
+                    for (let i = 0; i < matjip.length; i++) {
+                        matjip[i] = getMatjipListWithGeoData(matjip[i]);
+                        makeList(matjip[i]['title'], matjip[i]['category'])
+                    }
+                }
+            }
+        });
+    }
+
+    function reviewList() {
+        $.ajax({
+            type: 'GET',
+            url: '/reviewlist',
+            data: {},
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    let review = response['review'];
+                    let review_pic = response['review_pic']
+                    for (let i = 0; i < review.length; i++) {
+                        console.log(review_pic)
+                        makeReview(review[i]['title'], review[i]['comment'], review_pic[i]['pic'])
+                    }
+                }
+            }
+        });
+    }
+
+    function makeReview(title, comment, pic) {
+        console.log(pic)
+        let tempHtml = `<p></p>
+                    <center>
+                        <div class="card" style="width: 400px;">
+                            <img class="card-img-top" src="static/${pic}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5>${title}</h5>
+                                <p class="card-text">${comment}</p>
+                            </div>
+                        </div>
+                    </center>`
+
+        $('#nav-my').append(tempHtml);
+    }
+
+    //box에 append
+    function makeList(title, category) {
+        let tempHtml = `<li class="list-group-item">
+                    <h5 class="card-title"><a href="#" class="matjip-title" onclick="">${title}</a></h5>
+                    <h6 class="card-subtitle mb-2 text-muted">${category}</h6>
+                </li>`
+
+        $('#matjip-box').append(tempHtml);
+    }
+
+    // matjip 좌표 정보를 바꾸기
+    function getMatjipListWithGeoData(matjip) {
+        // 반환할 맛집 목록
+        let mapx = matjip['mapx'];
+        let mapy = matjip['mapy'];
+        // TM128 좌표를 위도(lat), 경도(lng) 딕셔너리로 반환
+        let geoData = getLatLng(mapx, mapy);
+        // geoData 라는 이름으로 맛집 데이터에 추가
+        matjip['geoData'] = geoData;
+        // 맛집 목록 반환
+        return matjip;
+    }
+
+    //검색한 맛집 지도에 마커 표시
+    function drawMap(matjipList) {
+        // 맛집의 위치 정보를 geoData에 저장합니다.
+        let geoData = matjipList[0]['geoData'];
+        let markerList = [];
+        let contents = [];
+
+        let numberOne = new naver.maps.LatLng(geoData['lat'], geoData['lng']),
+            map = new naver.maps.Map('map', {
+                center: numberOne,
+                zoom: 15
+            }),
+            marker = new naver.maps.Marker({
+                position: numberOne,
+                map: map
+            });
+        for (let i = 0; i < matjipList.length; i++) {
+            let matjip = matjipList[i];
+            let position = new naver.maps.LatLng(matjip['geoData']['lat'], matjip['geoData']['lng'])
+            marker = new naver.maps.Marker({
+                position: position,
+                map: map
+            });
+            let contentString = `<div class="iw_inner">
+                          <h6>${matjip['title']}</h6>
+                                    </div>`;
+            contents.push(contentString);
+            markerList.push(marker);
+        }
+        const matjipElement = $('.matjip-title');
+
+        for (let i = 0; i < markerList.length; i++) {
+            let marker = markerList[i];
+            let infowindow = new naver.maps.InfoWindow({
+                content: contents[i],
+                maxWidth: 140,
+                backgroundColor: "#eee",
+                anchorSize: new naver.maps.Size(10, 10),
+                anchorSkew: true,
+                anchorColor: "#eee",
+                pixelOffset: new naver.maps.Point(0, -20)
+            });
+            naver.maps.Event.addListener(marker, "click", function (e) {
+                if (infowindow.getMap()) {
+                    infowindow.close();
+                } else {
+                    infowindow.open(map, marker);
+                }
+            });
+
+            matjipElement[i].addEventListener('click', function (e) {
+                e.preventDefault();
+                if (infowindow.getMap()) {
+                    infowindow.close();
+                } else {
+                    infowindow.open(map, marker);
+                }
+            })
+        }
+    }
+
+
+    // TM128 좌표를 위도(lat), 경도(lng) 딕셔너리로 반환
+    function getLatLng(mapx, mapy) {
+        // 문자열 -> 숫자로 변환
+        let x = parseInt(mapx);
+        let y = parseInt(mapy);
+        // 네이버가 제공하는 변환 함수 사용
+        let geoInfo = naver.maps.TransCoord.fromTM128ToLatLng(new naver.maps.Point(x, y));
+        // 변환 딕셔너리 반환
+        return {'lat': geoInfo._lat, 'lng': geoInfo._lng}
+    }
+
+</script>
+</body>
+</html>
